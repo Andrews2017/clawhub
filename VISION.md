@@ -5,6 +5,7 @@ It runs on your devices, in your channels, with your rules.
 
 This document explains the current state and direction of the project.
 We are still early, so iteration is fast.
+Project overview and developer docs: [`README.md`](README.md)
 
 OpenClaw started as my personal playground to learn AI and build something genuinely useful:
 an assistant that can run real tasks on my computer.

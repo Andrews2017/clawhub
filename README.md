@@ -13,6 +13,7 @@ onlycrabs.ai is the **SOUL.md registry**: publish and share system lore the same
 
 Live: `https://clawhub.ai`
 onlycrabs.ai: `https://onlycrabs.ai`
+Vision: [`VISION.md`](VISION.md)
 
 ## What you can do with it
 
