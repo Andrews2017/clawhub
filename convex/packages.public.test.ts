@@ -993,4 +993,19 @@ describe("packages public queries", () => {
       }),
     ).rejects.toThrow(/Package publish payload/i);
   });
+
+  it("rejects skill publishes on the package endpoint", async () => {
+    await expect(
+      publishPackageHandler({} as never, {
+        userId: "users:owner",
+        payload: {
+          name: "demo-skill",
+          family: "skill",
+          version: "1.0.0",
+          changelog: "init",
+          files: [],
+        },
+      }),
+    ).rejects.toThrow("Skill packages must use the skills publish flow");
+  });
 });

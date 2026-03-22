@@ -1,3 +1,5 @@
+import ignore from "ignore";
+
 type NormalizePackageUploadPathOptions = {
   stripTopLevelFolder?: boolean;
 };
@@ -18,6 +20,12 @@ const KNOWN_PACKAGE_ROOT_PATHS = new Set([
   'README.mdx',
   'readme.mdx',
 ]);
+const DOT_DIR = '.clawhub';
+const LEGACY_DOT_DIR = '.clawdhub';
+const DOT_IGNORE = '.clawhubignore';
+const LEGACY_DOT_IGNORE = '.clawdhubignore';
+const PACKAGE_IGNORE_FILES = new Set(['.gitignore', DOT_IGNORE, LEGACY_DOT_IGNORE]);
+const DEFAULT_PACKAGE_IGNORE_PATTERNS = ['.git/', 'node_modules/', `${DOT_DIR}/`, `${LEGACY_DOT_DIR}/`];
 
 export function normalizePackageUploadPath(
   path: string,
@@ -31,10 +39,21 @@ export function normalizePackageUploadPath(
   return parts.slice(1).join("/") || (parts.at(-1) ?? "");
 }
 
+function getRawUploadPath<TFile extends UploadablePackageFile>(file: TFile) {
+  return file.webkitRelativePath?.trim() || file.name;
+}
+
+function getNormalizedUploadPath<TFile extends UploadablePackageFile>(
+  file: TFile,
+  options: NormalizePackageUploadPathOptions = {},
+) {
+  return normalizePackageUploadPath(getRawUploadPath(file), options) || file.name;
+}
+
 function shouldStripSharedTopLevelFolder<TFile extends UploadablePackageFile>(files: TFile[]) {
   if (files.length === 0) return false;
   const partsList = files
-    .map((file) => normalizePackageUploadPath(file.webkitRelativePath?.trim() || file.name))
+    .map((file) => getNormalizedUploadPath(file))
     .filter(Boolean)
     .map((path) => path.split("/").filter(Boolean));
   if (partsList.length === 0 || partsList.some((parts) => parts.length < 2)) return false;
@@ -46,6 +65,35 @@ function shouldStripSharedTopLevelFolder<TFile extends UploadablePackageFile>(fi
   return partsList
     .map((parts) => parts.slice(1).join("/"))
     .some((path) => KNOWN_PACKAGE_ROOT_PATHS.has(path));
+}
+
+export async function filterIgnoredPackageFiles<TFile extends UploadablePackageFile & Pick<File, "text">>(
+  files: TFile[],
+) {
+  const stripTopLevelFolder = shouldStripSharedTopLevelFolder(files);
+  const normalized = files.map((file) => ({
+    file,
+    path: getNormalizedUploadPath(file, { stripTopLevelFolder }),
+  }));
+  const ig = ignore();
+  ig.add(DEFAULT_PACKAGE_IGNORE_PATTERNS);
+
+  for (const entry of normalized) {
+    if (!PACKAGE_IGNORE_FILES.has(entry.path)) continue;
+    ig.add((await entry.file.text()).split(/\r?\n/));
+  }
+
+  const kept: TFile[] = [];
+  const ignoredPaths: string[] = [];
+  for (const entry of normalized) {
+    if (ig.ignores(entry.path)) {
+      ignoredPaths.push(entry.path);
+      continue;
+    }
+    kept.push(entry.file);
+  }
+
+  return { files: kept, ignoredPaths };
 }
 
 export async function buildPackageUploadEntries<TFile extends UploadablePackageFile>(
@@ -69,12 +117,7 @@ export async function buildPackageUploadEntries<TFile extends UploadablePackageF
     const sha256 = await options.hashFile(file);
     const uploadUrl = await options.generateUploadUrl();
     const storageId = await options.uploadFile(uploadUrl, file);
-    const relativePath = file.webkitRelativePath?.trim() || "";
-    const rawPath = relativePath || file.name;
-    const path =
-      normalizePackageUploadPath(rawPath, {
-        stripTopLevelFolder,
-      }) || file.name;
+    const path = getNormalizedUploadPath(file, { stripTopLevelFolder });
     uploaded.push({
       path,
       size: file.size,

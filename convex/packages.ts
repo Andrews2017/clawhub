@@ -556,6 +556,9 @@ export const publishPackage = action({
       args.payload,
       "Package publish payload",
     ) as PackagePublishRequest;
+    if (payload.family === "skill") {
+      throw new ConvexError("Skill packages must use the skills publish flow");
+    }
     await requireGitHubAccountAge(ctx, args.userId);
 
     const family = payload.family;
@@ -568,12 +571,9 @@ export const publishPackage = action({
       throw new ConvexError("Package exceeds 50MB limit");
     }
 
-    const existingSkill =
-      family !== "skill"
-        ? await runQueryRef(ctx, internalRefs.skills.getSkillBySlugInternal, {
-            slug: name,
-          })
-        : null;
+    const existingSkill = await runQueryRef(ctx, internalRefs.skills.getSkillBySlugInternal, {
+      slug: name,
+    });
     if (existingSkill) {
       throw new ConvexError(`Package name collides with existing skill slug "${name}"`);
     }

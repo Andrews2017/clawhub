@@ -3,7 +3,7 @@ import { useAction, useMutation } from "convex/react";
 import { startTransition, useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { expandDroppedItems, expandFilesWithReport } from "../../lib/uploadFiles";
-import { buildPackageUploadEntries } from "../../lib/packageUpload";
+import { buildPackageUploadEntries, filterIgnoredPackageFiles } from "../../lib/packageUpload";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatBytes, formatPublishError, hashFile, uploadFile } from "../upload/-utils";
 
@@ -35,6 +35,7 @@ function PublishPackageRoute() {
   const [bundleFormat, setBundleFormat] = useState("");
   const [hostTargets, setHostTargets] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [ignoredPaths, setIgnoredPaths] = useState<string[]>([]);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,10 +45,13 @@ function PublishPackageRoute() {
     const expanded = await expandFilesWithReport(selected, {
       includeBinaryArchiveFiles: true,
     });
-    setFiles(expanded.files);
+    const filtered = await filterIgnoredPackageFiles(expanded.files);
+    const nextIgnoredPaths = [...new Set([...expanded.ignoredMacJunkPaths, ...filtered.ignoredPaths])];
+    setFiles(filtered.files);
+    setIgnoredPaths(nextIgnoredPaths);
     setError(null);
 
-    const packageJson = expanded.files.find((file) => file.name.toLowerCase().endsWith("package.json"));
+    const packageJson = filtered.files.find((file) => file.name.toLowerCase().endsWith("package.json"));
     if (!packageJson) return;
     try {
       const text = await packageJson.text();
@@ -143,6 +147,7 @@ function PublishPackageRoute() {
           }}
         />
         <div className="tag">{files.length} files · {formatBytes(totalBytes)}</div>
+        {ignoredPaths.length > 0 ? <div className="tag">Ignored {ignoredPaths.length} files via ignore rules.</div> : null}
         <button
           className="btn"
           type="button"

@@ -1,7 +1,7 @@
 /* @vitest-environment node */
 
 import { describe, expect, it, vi } from "vitest";
-import { buildPackageUploadEntries, normalizePackageUploadPath } from "./packageUpload";
+import { buildPackageUploadEntries, filterIgnoredPackageFiles, normalizePackageUploadPath } from "./packageUpload";
 
 describe("normalizePackageUploadPath", () => {
   it("strips the picked folder prefix", () => {
@@ -23,6 +23,30 @@ describe("normalizePackageUploadPath", () => {
 });
 
 describe("buildPackageUploadEntries", () => {
+  it("filters builtin and ignore-file package paths before upload", async () => {
+    const filtered = await filterIgnoredPackageFiles([
+      new File(['{}'], 'demo-plugin/package.json', { type: 'application/json' }),
+      new File(['dist/\nsecret.txt\n'], 'demo-plugin/.gitignore', { type: 'text/plain' }),
+      new File(['ignored'], 'demo-plugin/node_modules/pkg/index.js', { type: 'text/javascript' }),
+      new File(['ignored'], 'demo-plugin/.git/config', { type: 'text/plain' }),
+      new File(['ignored'], 'demo-plugin/dist/index.js', { type: 'text/javascript' }),
+      new File(['kept'], 'demo-plugin/src/index.js', { type: 'text/javascript' }),
+      new File(['ignored'], 'demo-plugin/secret.txt', { type: 'text/plain' }),
+    ]);
+
+    expect(filtered.files.map((file) => file.name)).toEqual([
+      'demo-plugin/package.json',
+      'demo-plugin/.gitignore',
+      'demo-plugin/src/index.js',
+    ]);
+    expect(filtered.ignoredPaths).toEqual([
+      'node_modules/pkg/index.js',
+      '.git/config',
+      'dist/index.js',
+      'secret.txt',
+    ]);
+  });
+
   it("requests a fresh upload url for each file", async () => {
     const files = [
       {
