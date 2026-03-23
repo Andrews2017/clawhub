@@ -8,7 +8,6 @@ import {
   GitBranch,
   Package,
   Plug,
-  Plus,
   ShieldCheck,
   Star,
   Upload,
@@ -149,10 +148,6 @@ function Dashboard() {
               ))}
             </select>
           ) : null}
-          <Link to="/upload" search={{ updateSlug: undefined }} className="btn btn-primary">
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            Upload Skill
-          </Link>
           <Link
             to="/plugins/new"
             search={{ ...emptyPluginPublishSearch, ownerHandle }}
@@ -167,63 +162,75 @@ function Dashboard() {
       <section className="card dashboard-owner-panel">
         <div className="dashboard-owner-grid">
           <section className="dashboard-collection-block">
-          <div className="dashboard-section-header">
-            <div>
-              <h2 className="dashboard-collection-title">Publisher Skills</h2>
-              <p className="section-subtitle" style={{ margin: "6px 0 0" }}>
-                Hidden skill versions remain visible here while checks are pending.
-              </p>
-            </div>
-          </div>
-          {skills.length === 0 ? (
-            <div className="dashboard-inline-empty">
-              <div className="dashboard-inline-empty-copy">
-                <strong>No skills yet.</strong> Upload your first skill to share it with the community.
+            <div className="dashboard-section-header">
+              <div>
+                <h2 className="dashboard-collection-title">Publisher Skills</h2>
+                <p className="section-subtitle" style={{ margin: "6px 0 0" }}>
+                  Hidden skill versions remain visible here while checks are pending.
+                </p>
               </div>
-              <Link to="/upload" search={{ updateSlug: undefined }} className="btn btn-primary">
-                <Upload className="h-4 w-4" aria-hidden="true" />
-                Upload a Skill
-              </Link>
             </div>
-          ) : (
-            <div className="dashboard-grid">
-              {skills.map((skill) => (
-                <SkillCard key={skill._id} skill={skill} ownerHandle={ownerHandle} />
-              ))}
-            </div>
-          )}
+            {skills.length === 0 ? (
+              <div className="dashboard-inline-empty">
+                <div className="dashboard-inline-empty-copy">
+                  <strong>No skills yet.</strong> Upload your first skill to share it with the community.
+                </div>
+                <Link to="/upload" search={{ updateSlug: undefined }} className="btn btn-primary">
+                  <Upload className="h-4 w-4" aria-hidden="true" />
+                  Upload a Skill
+                </Link>
+              </div>
+            ) : (
+              <div className="dashboard-list">
+                <div className="dashboard-list-header">
+                  <span>Skill</span>
+                  <span>Summary</span>
+                  <span>Status</span>
+                  <span>Actions</span>
+                </div>
+                {skills.map((skill) => (
+                  <SkillRow key={skill._id} skill={skill} ownerHandle={ownerHandle} />
+                ))}
+              </div>
+            )}
           </section>
 
           <section className="dashboard-collection-block">
-          <div className="dashboard-section-header">
-            <div>
-              <h2 className="dashboard-collection-title">Publisher Plugins</h2>
-              <p className="section-subtitle" style={{ margin: "6px 0 0" }}>
-                Owner-only package view with VirusTotal, static scan, and verification state.
-              </p>
-            </div>
-          </div>
-          {packages.length === 0 ? (
-            <div className="dashboard-inline-empty">
-              <div className="dashboard-inline-empty-copy">
-                <strong>No plugins yet.</strong> Publish your first plugin release to validate and distribute it.
+            <div className="dashboard-section-header">
+              <div>
+                <h2 className="dashboard-collection-title">Publisher Plugins</h2>
+                <p className="section-subtitle" style={{ margin: "6px 0 0" }}>
+                  Owner-only package view with VirusTotal, static scan, and verification state.
+                </p>
               </div>
-              <Link
-                to="/plugins/new"
-                search={{ ...emptyPluginPublishSearch, ownerHandle }}
-                className="btn btn-primary"
-              >
-                <Plug className="h-4 w-4" aria-hidden="true" />
-                Publish a Plugin
-              </Link>
             </div>
-          ) : (
-            <div className="dashboard-grid">
-              {packages.map((pkg) => (
-                <PackageCard key={pkg._id} pkg={pkg} ownerHandle={ownerHandle} />
-              ))}
-            </div>
-          )}
+            {packages.length === 0 ? (
+              <div className="dashboard-inline-empty">
+                <div className="dashboard-inline-empty-copy">
+                  <strong>No plugins yet.</strong> Publish your first plugin release to validate and distribute it.
+                </div>
+                <Link
+                  to="/plugins/new"
+                  search={{ ...emptyPluginPublishSearch, ownerHandle }}
+                  className="btn btn-primary"
+                >
+                  <Plug className="h-4 w-4" aria-hidden="true" />
+                  Publish a Plugin
+                </Link>
+              </div>
+            ) : (
+              <div className="dashboard-list">
+                <div className="dashboard-list-header">
+                  <span>Plugin</span>
+                  <span>Summary</span>
+                  <span>Status</span>
+                  <span>Actions</span>
+                </div>
+                {packages.map((pkg) => (
+                  <PackageRow key={pkg._id} pkg={pkg} ownerHandle={ownerHandle} />
+                ))}
+              </div>
+            )}
           </section>
         </div>
       </section>
@@ -231,11 +238,11 @@ function Dashboard() {
   );
 }
 
-function SkillCard({ skill, ownerHandle }: { skill: DashboardSkill; ownerHandle: string | null }) {
+function SkillRow({ skill, ownerHandle }: { skill: DashboardSkill; ownerHandle: string | null }) {
   return (
-    <div className="dashboard-skill-card">
-      <div className="dashboard-skill-info">
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+    <div className="dashboard-list-row">
+      <div className="dashboard-list-primary">
+        <div className="dashboard-list-title">
           <Link
             to="/$owner/$slug"
             params={{ owner: ownerHandle ?? "unknown", slug: skill.slug }}
@@ -243,7 +250,7 @@ function SkillCard({ skill, ownerHandle }: { skill: DashboardSkill; ownerHandle:
           >
             {skill.displayName}
           </Link>
-          <span className="dashboard-skill-slug">/{skill.slug}</span>
+          <span className="dashboard-list-id">/{skill.slug}</span>
           {skill.pendingReview ? (
             <span className="tag tag-pending">
               <Clock className="h-3 w-3" aria-hidden="true" />
@@ -251,21 +258,35 @@ function SkillCard({ skill, ownerHandle }: { skill: DashboardSkill; ownerHandle:
             </span>
           ) : null}
         </div>
-        {skill.summary && <p className="dashboard-skill-description">{skill.summary}</p>}
-        {skill.pendingReview ? (
-          <p className="dashboard-skill-description">
-            Hidden until VirusTotal and verification checks finish.
-          </p>
-        ) : null}
-        <div className="dashboard-skill-stats">
+        <div className="dashboard-inline-metrics">
           <span>
-            <Package size={13} aria-hidden="true" /> {formatCompactStat(skill.stats.downloads)}
+            <ArrowDownToLine size={13} aria-hidden="true" /> {formatCompactStat(skill.stats.downloads)}
           </span>
-          <span>★ {formatCompactStat(skill.stats.stars)}</span>
-          <span>{skill.stats.versions} v</span>
+          <span>
+            <Star size={13} aria-hidden="true" /> {formatCompactStat(skill.stats.stars)}
+          </span>
+          <span>
+            <Package size={13} aria-hidden="true" /> {skill.stats.versions}
+          </span>
         </div>
       </div>
-      <div className="dashboard-skill-actions">
+      <div className="dashboard-list-summary">{skill.summary ?? "No summary provided."}</div>
+      <div className="dashboard-list-status">
+        {skill.pendingReview ? (
+          <>
+            <span className="dashboard-inline-status-item">
+              <ShieldCheck size={13} aria-hidden="true" />
+              VT pending
+            </span>
+            <span className="dashboard-inline-status-note">
+              Hidden until verification checks finish.
+            </span>
+          </>
+        ) : (
+          <span className="dashboard-inline-status-note">Visible</span>
+        )}
+      </div>
+      <div className="dashboard-row-actions">
         <Link to="/upload" search={{ updateSlug: skill.slug }} className="btn btn-sm">
           <Upload className="h-3 w-3" aria-hidden="true" />
           New Version
@@ -327,7 +348,7 @@ function PackageStatusTag({
   return <span className={className}>{label}</span>;
 }
 
-function PackageCard({ pkg, ownerHandle }: { pkg: DashboardPackage; ownerHandle: string }) {
+function PackageRow({ pkg, ownerHandle }: { pkg: DashboardPackage; ownerHandle: string }) {
   const scanLabel = scanStatusLabel(pkg.scanStatus);
   const nextVersion = pkg.latestVersion ? semver.inc(pkg.latestVersion, "patch") : null;
   const sourceLabel = pkg.sourceRepo?.replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, "");
@@ -351,15 +372,15 @@ function PackageCard({ pkg, ownerHandle }: { pkg: DashboardPackage; ownerHandle:
           : "default";
 
   return (
-    <div className="dashboard-skill-card dashboard-package-card">
-      <div className="dashboard-skill-info dashboard-package-info">
-        <div className="dashboard-package-heading">
+    <div className="dashboard-list-row">
+      <div className="dashboard-list-primary">
+        <div className="dashboard-list-title">
           <Link to="/plugins/$name" params={{ name: pkg.name }} className="dashboard-skill-name">
             {pkg.displayName}
           </Link>
-          <span className="dashboard-skill-slug">{pkg.name}</span>
+          <span className="dashboard-list-id">{pkg.name}</span>
         </div>
-        <div className="dashboard-package-tags">
+        <div className="dashboard-inline-tags">
           <PackageStatusTag label={familyLabel(pkg.family)} tone="default" />
           <PackageStatusTag label={pkg.channel} tone="default" />
           {scanLabel ? <PackageStatusTag label={scanLabel} tone={scanTone} /> : null}
@@ -373,65 +394,51 @@ function PackageCard({ pkg, ownerHandle }: { pkg: DashboardPackage; ownerHandle:
             />
           ) : null}
         </div>
-        {pkg.summary ? <p className="dashboard-skill-description">{pkg.summary}</p> : null}
-        <div className="dashboard-package-status-row">
-          <span className="dashboard-package-status-item">
-            <ShieldCheck size={13} aria-hidden="true" />{" "}
-            {releaseStatusLabel(
-              "VT",
-              pkg.latestRelease?.vtStatus,
-              pkg.scanStatus === "pending" ? "pending" : "unknown",
-            )}
+        <div className="dashboard-inline-metrics">
+          <span>
+            <ArrowDownToLine size={13} aria-hidden="true" /> {formatCompactStat(pkg.stats.downloads)}
           </span>
-          <span className="dashboard-package-status-item">
-            <CheckCircle2 size={13} aria-hidden="true" />{" "}
-            {releaseStatusLabel("LLM", pkg.latestRelease?.llmStatus)}
+          <span>
+            <Star size={13} aria-hidden="true" /> {formatCompactStat(pkg.stats.stars)}
           </span>
-          <span className="dashboard-package-status-item">
-            <AlertTriangle size={13} aria-hidden="true" />{" "}
-            {releaseStatusLabel("Static", pkg.latestRelease?.staticScanStatus)}
+          <span>
+            <Package size={13} aria-hidden="true" /> {pkg.stats.versions}
           </span>
-        </div>
-        <div className="dashboard-package-meta">
-          <DashboardMetaChip
-            icon={<ArrowDownToLine size={14} aria-hidden="true" />}
-            label="Downloads"
-            value={formatCompactStat(pkg.stats.downloads)}
-          />
-          <DashboardMetaChip
-            icon={<Star size={14} aria-hidden="true" />}
-            label="Stars"
-            value={formatCompactStat(pkg.stats.stars)}
-          />
-          <DashboardMetaChip
-            icon={<Package size={14} aria-hidden="true" />}
-            label="Versions"
-            value={String(pkg.stats.versions)}
-          />
-          <DashboardMetaChip
-            icon={<GitBranch size={14} aria-hidden="true" />}
-            label="Latest"
-            value={pkg.latestVersion ?? "No tag"}
-          />
+          <span>
+            <GitBranch size={13} aria-hidden="true" /> {pkg.latestVersion ?? "No tag"}
+          </span>
           {pkg.runtimeId ? (
-            <DashboardMetaChip
-              icon={<Plug size={14} aria-hidden="true" />}
-              label="Runtime"
-              value={pkg.runtimeId}
-              mono
-            />
+            <span>
+              <Plug size={13} aria-hidden="true" /> {pkg.runtimeId}
+            </span>
           ) : null}
           {sourceLabel ? (
-            <DashboardMetaChip
-              icon={<ShieldCheck size={14} aria-hidden="true" />}
-              label="Source"
-              value={sourceLabel}
-              mono
-            />
+            <span>
+              <ShieldCheck size={13} aria-hidden="true" /> {sourceLabel}
+            </span>
           ) : null}
         </div>
       </div>
-      <div className="dashboard-skill-actions">
+      <div className="dashboard-list-summary">{pkg.summary ?? "No summary provided."}</div>
+      <div className="dashboard-list-status">
+        <span className="dashboard-inline-status-item">
+          <ShieldCheck size={13} aria-hidden="true" />{" "}
+          {releaseStatusLabel(
+            "VT",
+            pkg.latestRelease?.vtStatus,
+            pkg.scanStatus === "pending" ? "pending" : "unknown",
+          )}
+        </span>
+        <span className="dashboard-inline-status-item">
+          <CheckCircle2 size={13} aria-hidden="true" />{" "}
+          {releaseStatusLabel("LLM", pkg.latestRelease?.llmStatus)}
+        </span>
+        <span className="dashboard-inline-status-item">
+          <AlertTriangle size={13} aria-hidden="true" />{" "}
+          {releaseStatusLabel("Static", pkg.latestRelease?.staticScanStatus)}
+        </span>
+      </div>
+      <div className="dashboard-row-actions">
         <Link
           to="/plugins/new"
           search={{
@@ -451,30 +458,6 @@ function PackageCard({ pkg, ownerHandle }: { pkg: DashboardPackage; ownerHandle:
           View
         </Link>
       </div>
-    </div>
-  );
-}
-
-function DashboardMetaChip({
-  icon,
-  label,
-  value,
-  mono = false,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  mono?: boolean;
-}) {
-  return (
-    <div className="dashboard-meta-chip">
-      <span className="dashboard-meta-icon">{icon}</span>
-      <span className="dashboard-meta-copy">
-        <span className="dashboard-meta-label">{label}</span>
-        <span className={mono ? "dashboard-meta-value dashboard-meta-value-mono" : "dashboard-meta-value"}>
-          {value}
-        </span>
-      </span>
     </div>
   );
 }

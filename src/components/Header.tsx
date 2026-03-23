@@ -1,6 +1,6 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Link } from "@tanstack/react-router";
-import { Menu, Monitor, Moon, Sun } from "lucide-react";
+import { ArrowDownToLine, Menu, Monitor, Moon, Sun, Upload } from "lucide-react";
 import { useMemo, useRef } from "react";
 import { getUserFacingConvexError } from "../lib/convexError";
 import { gravatarUrl } from "../lib/gravatar";
@@ -94,10 +94,6 @@ export default function Header() {
             </Link>
           )}
           {isSoulMode ? null : <Link to="/plugins">Plugins</Link>}
-          <Link to="/upload" search={{ updateSlug: undefined }}>
-            Upload
-          </Link>
-          {isSoulMode ? null : <Link to="/import">Import</Link>}
           <Link
             to={isSoulMode ? "/souls" : "/skills"}
             search={
@@ -177,16 +173,6 @@ export default function Header() {
                 {isSoulMode ? null : (
                   <DropdownMenuItem asChild>
                     <Link to="/plugins">Plugins</Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem asChild>
-                  <Link to="/upload" search={{ updateSlug: undefined }}>
-                    Upload
-                  </Link>
-                </DropdownMenuItem>
-                {isSoulMode ? null : (
-                  <DropdownMenuItem asChild>
-                    <Link to="/import">Import</Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
@@ -284,6 +270,20 @@ export default function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard">Dashboard</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/upload" search={{ updateSlug: undefined }}>
+                    <Upload className="h-4 w-4" aria-hidden="true" />
+                    Upload
+                  </Link>
+                </DropdownMenuItem>
+                {isSoulMode ? null : (
+                  <DropdownMenuItem asChild>
+                    <Link to="/import">
+                      <ArrowDownToLine className="h-4 w-4" aria-hidden="true" />
+                      Import
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/settings">Settings</Link>
                 </DropdownMenuItem>

@@ -3511,12 +3511,6 @@ html.theme-transition::view-transition-new(theme) {
   margin: 0;
 }
 
-.dashboard-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .dashboard-owner-panel {
   padding: 20px;
 }
@@ -3567,37 +3561,120 @@ html.theme-transition::view-transition-new(theme) {
   color: var(--color-text);
 }
 
-.dashboard-skill-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 16px 20px;
-  background: var(--card-bg);
+.dashboard-list {
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  transition: border-color 0.15s ease;
+  border-radius: 14px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
 }
 
-.dashboard-skill-card:hover {
-  border-color: var(--color-accent);
+.dashboard-list-header,
+.dashboard-list-row {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.15fr) minmax(0, 1fr) minmax(240px, 0.95fr) auto;
+  gap: 16px;
+  align-items: start;
+  padding: 14px 18px;
 }
 
-.dashboard-skill-info {
-  flex: 1;
+.dashboard-list-header {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  border-bottom: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+}
+
+.dashboard-list-row {
+  border-bottom: 1px solid var(--card-border);
+  transition: background 0.15s ease;
+}
+
+.dashboard-list-row:last-child {
+  border-bottom: none;
+}
+
+.dashboard-list-row:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.dashboard-list-primary {
+  display: grid;
+  gap: 8px;
   min-width: 0;
 }
 
-.dashboard-package-info {
-  display: grid;
-  gap: 12px;
-}
-
-.dashboard-package-heading {
+.dashboard-list-title {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+  min-width: 0;
+}
+
+.dashboard-list-id {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  color: var(--color-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-inline-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dashboard-inline-metrics {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.dashboard-inline-metrics span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.dashboard-list-summary {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.dashboard-list-status {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+}
+
+.dashboard-inline-status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  font-size: 0.8rem;
+  color: var(--color-muted);
 }
 
 .dashboard-skill-name {
@@ -3611,112 +3688,10 @@ html.theme-transition::view-transition-new(theme) {
   color: var(--color-accent);
 }
 
-.dashboard-skill-slug {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-muted);
-}
-
-.dashboard-package-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.dashboard-skill-description {
-  font-size: 0.9rem;
-  color: var(--color-muted);
-  margin: 0;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.dashboard-package-status-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.dashboard-package-status-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--card-border);
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  font-size: 0.8rem;
-  line-height: 1.2;
-  color: var(--color-muted);
-}
-
-.dashboard-package-meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
-}
-
-.dashboard-meta-chip {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 11px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  background: color-mix(in srgb, var(--surface) 90%, transparent);
-  min-width: 0;
-}
-
-.dashboard-meta-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.dashboard-meta-copy {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.dashboard-meta-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.dashboard-meta-value {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dashboard-meta-value-mono {
-  font-family: var(--font-mono);
+.dashboard-inline-status-note {
   font-size: 0.82rem;
-}
-
-.dashboard-skill-stats {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-  font-size: 0.8rem;
+  line-height: 1.4;
   color: var(--color-muted);
-  flex-wrap: wrap;
 }
 
 .dashboard-tag-warning {
@@ -3734,7 +3709,7 @@ html.theme-transition::view-transition-new(theme) {
   color: #047857;
 }
 
-.dashboard-skill-actions {
+.dashboard-row-actions {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
@@ -3769,20 +3744,20 @@ html.theme-transition::view-transition-new(theme) {
     align-items: stretch;
   }
 
-  .dashboard-skill-card {
-    flex-direction: column;
+  .dashboard-list-header {
+    display: none;
+  }
+
+  .dashboard-list-row {
+    grid-template-columns: 1fr;
     gap: 12px;
   }
 
-  .dashboard-package-meta {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-skill-actions {
+  .dashboard-row-actions {
     width: 100%;
   }
 
-  .dashboard-skill-actions .btn {
+  .dashboard-row-actions .btn {
     flex: 1;
     justify-content: center;
   }
