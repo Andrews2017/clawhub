@@ -231,8 +231,18 @@ async function getForwardedHeaders() {
     const headers: Record<string, string> = {};
     const cookie = requestHeaders.get("cookie");
     const authorization = requestHeaders.get("authorization");
+    const clientIpHeaders = [
+      "cf-connecting-ip",
+      "x-forwarded-for",
+      "x-real-ip",
+      "fly-client-ip",
+    ] as const;
     if (cookie) headers.cookie = cookie;
     if (authorization) headers.authorization = authorization;
+    for (const headerName of clientIpHeaders) {
+      const value = requestHeaders.get(headerName);
+      if (value) headers[headerName] = value;
+    }
     return headers;
   } catch {
     return {};

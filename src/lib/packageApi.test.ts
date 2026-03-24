@@ -161,7 +161,15 @@ describe("fetchPackages", () => {
   it("forwards request cookies and includes credentials for package detail fetches", async () => {
     vi.stubEnv("VITE_CONVEX_URL", "https://registry.example");
     getRequestUrlMock.mockReturnValue(new URL("https://app.example/packages/private-plugin"));
-    getRequestHeadersMock.mockReturnValue(new Headers({ cookie: "session=abc" }));
+    getRequestHeadersMock.mockReturnValue(
+      new Headers({
+        cookie: "session=abc",
+        "cf-connecting-ip": "203.0.113.9",
+        "x-forwarded-for": "203.0.113.9, 198.51.100.2",
+        "x-real-ip": "203.0.113.9",
+        "fly-client-ip": "203.0.113.9",
+      }),
+    );
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ package: null, owner: null }), { status: 200 }),
     );
@@ -175,6 +183,10 @@ describe("fetchPackages", () => {
         headers: expect.objectContaining({
           Accept: "application/json",
           cookie: "session=abc",
+          "cf-connecting-ip": "203.0.113.9",
+          "x-forwarded-for": "203.0.113.9, 198.51.100.2",
+          "x-real-ip": "203.0.113.9",
+          "fly-client-ip": "203.0.113.9",
         }),
       }),
     );
